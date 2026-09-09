@@ -47,6 +47,7 @@ export default function Home() {
           <span className="brand-copy"><b>Escuela Técnica</b><small>Juan Lacaze</small></span>
         </a>
         <nav className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Navegación principal">
+          <a href="/futuro" onClick={closeMenu}>Experiencia joven</a>
           <a href="#propuestas" onClick={closeMenu}>Propuestas</a><a href="#vida-utu" onClick={closeMenu}>Vida UTU</a>
           <a href="#eventos" onClick={closeMenu}>Novedades</a><a href="#equipo" onClick={closeMenu}>Equipo</a><a href="#contacto" onClick={closeMenu}>Contacto</a>
           <a className="nav-cta" href="#contacto" onClick={closeMenu}>Quiero estudiar <ArrowRight size={16}/></a>
