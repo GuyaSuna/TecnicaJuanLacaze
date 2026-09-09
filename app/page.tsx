@@ -34,7 +34,7 @@ export default function Home() {
     const observer = new IntersectionObserver(entries => entries.forEach(e => e.isIntersecting && e.target.classList.add("visible")), {threshold:.12});
     nodes.forEach(node => observer.observe(node));
     return () => observer.disconnect();
-  }, []);
+  }, [filter]);
 
   const closeMenu = () => setMenuOpen(false);
   const visibleCourses = filter === "Todas" ? courses : courses.filter(c => c.area === filter);
