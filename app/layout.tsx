@@ -1,17 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
   const incoming = await headers();
@@ -19,27 +11,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol = incoming.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
   const title = "Escuela Técnica de Juan Lacaze | UTU";
-  const description = "Propuestas educativas, novedades y vida estudiantil de la Escuela Técnica de Juan Lacaze.";
+  const description = "Propuestas educativas, información para estudiantes, novedades, inscripciones y contacto de la Escuela Técnica de Juan Lacaze.";
   return {
-    title, description,
+    title,
+    description,
     icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
     openGraph: { title, description, images: [`${origin}/og.png`], locale: "es_UY", type: "website" },
     twitter: { card: "summary_large_image", title, description, images: [`${origin}/og.png`] },
   };
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="es">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
-  );
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <html lang="es"><body className={geist.variable}>{children}</body></html>;
 }
