@@ -24,6 +24,7 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { contact, officialLinks, proposals, type Proposal } from "./site-content";
 
@@ -90,16 +91,22 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openQuestion, setOpenQuestion] = useState(0);
   const firstMenuLink = useRef<HTMLAnchorElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (menuOpen) firstMenuLink.current?.focus();
   }, [menuOpen]);
 
   useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && setMenuOpen(false);
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && menuOpen) {
+        setMenuOpen(false);
+        menuButton.current?.focus();
+      }
+    };
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, []);
+  }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -111,7 +118,7 @@ export default function Home() {
           <span className="brand__mark" aria-hidden="true">UTU</span>
           <span className="brand__copy"><strong>Escuela Técnica</strong><small>Juan Lacaze</small></span>
         </a>
-        <nav className={`main-nav${menuOpen ? " main-nav--open" : ""}`} aria-label="Navegación principal">
+        <nav id="main-navigation" className={`main-nav${menuOpen ? " main-nav--open" : ""}`} aria-label="Navegación principal">
           <a ref={firstMenuLink} href="#institucion" onClick={closeMenu}>Institución</a>
           <a href="#propuestas" onClick={closeMenu}>Propuestas</a>
           <a href="#estudiantes" onClick={closeMenu}>Estudiantes</a>
@@ -120,7 +127,7 @@ export default function Home() {
           <a href="#contacto" onClick={closeMenu}>Contacto</a>
         </nav>
         <a className="header-cta" href="#inscripciones">Cómo inscribirse <ArrowRight /></a>
-        <button className="menu-toggle" type="button" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} aria-expanded={menuOpen}>
+        <button ref={menuButton} className="menu-toggle" type="button" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} aria-expanded={menuOpen} aria-controls="main-navigation">
           {menuOpen ? <X /> : <Menu />}
         </button>
       </header>
@@ -142,10 +149,10 @@ export default function Home() {
             </ul>
           </div>
           <div className="hero__visual">
-            <img src="/images/inclusion.jpg" alt="Jornada educativa sobre inclusión realizada con la comunidad de Juan Lacaze" />
+            <Image src="/images/inclusion.jpg" alt="Jornada educativa sobre inclusión realizada con la comunidad de Juan Lacaze" fill priority sizes="(max-width: 850px) 100vw, 50vw" />
             <div className="hero__caption"><span>Comunidad educativa</span><b>Aprender también es encontrarnos</b></div>
             <div className="hero__school-card">
-              <img src="/images/escuela.jpg" alt="Fachada de la Escuela Técnica de Juan Lacaze" />
+              <Image src="/images/escuela.jpg" alt="Fachada de la Escuela Técnica de Juan Lacaze" width={350} height={205} sizes="(max-width: 600px) 138px, 235px" />
               <span><b>Nuestra escuela</b><small>José Salvo esq. Don Bosco</small></span>
             </div>
           </div>
@@ -211,11 +218,11 @@ export default function Home() {
               <div><p className="eyebrow">Egresos</p><h3>Colonia celebró a más de 170 egresados de sus centros educativos</h3><p>La Escuela Técnica de Juan Lacaze fue parte de una jornada que reunió a estudiantes, familias y equipos educativos de la región.</p><span className="text-link">Leer noticia oficial <ExternalLink /></span></div>
             </a>
             <a className="news-card" href={officialLinks.innovation} target="_blank" rel="noreferrer">
-              <img src="/images/nodo-innovacion.jpg" alt="Equipamiento del Nodo de Innovación de Juan Lacaze" loading="lazy" />
+              <Image src="/images/nodo-innovacion.jpg" alt="Equipamiento del Nodo de Innovación de Juan Lacaze" width={1024} height={684} sizes="(max-width: 600px) 100vw, (max-width: 1100px) 50vw, 31vw" />
               <div><span>19 NOV. 2025 · INNOVACIÓN</span><h3>Juan Lacaze puso en marcha un Nodo de Innovación abierto a la comunidad</h3><b>Leer noticia <ArrowRight /></b></div>
             </a>
             <a className="news-card" href={officialLinks.inclusion} target="_blank" rel="noreferrer">
-              <img src="/images/inclusion.jpg" alt="Taller sobre autismo, educación e inclusión" loading="lazy" />
+              <Image src="/images/inclusion.jpg" alt="Taller sobre autismo, educación e inclusión" width={2560} height={1438} sizes="(max-width: 600px) 100vw, (max-width: 1100px) 50vw, 31vw" />
               <div><span>23 JUN. 2025 · INCLUSIÓN</span><h3>Un taller para construir una educación más accesible</h3><b>Leer noticia <ArrowRight /></b></div>
             </a>
           </div>
