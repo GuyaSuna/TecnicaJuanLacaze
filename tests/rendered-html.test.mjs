@@ -18,35 +18,84 @@ async function request(pathname = "/") {
   );
 }
 
-test("renders the institutional homepage with its core information", async () => {
-  const response = await request();
-  assert.equal(response.status, 200);
+async function html(pathname) {
+  const response = await request(pathname);
+  assert.equal(response.status, 200, `${pathname} should render`);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+  return response.text();
+}
 
-  const html = await response.text();
-  assert.match(html, /<html[^>]+lang="es"/i);
-  assert.match(html, /<title>Escuela Técnica de Juan Lacaze \| UTU<\/title>/i);
-  assert.match(html, /Formación que acompaña/);
-  assert.match(html, /Educación Básica Integrada/);
-  assert.match(html, /Tecnologías de la Información/);
-  assert.match(html, /Apertura 2026 a confirmar/);
-  assert.match(html, /José Salvo s\/n\.º esq\. Don Bosco/);
-  assert.match(html, /tecnicajuanlacaze@gmail\.com/);
-  assert.doesNotMatch(html, /Aprendé haciendo\./);
+const routes = [
+  { path: "/", title: "Escuela Técnica de Juan Lacaze | UTU", text: /Un lugar para aprender, crecer y construir tu camino/ },
+  { path: "/institucion", title: "Sobre la institución | Escuela Técnica de Juan Lacaze", text: /4 de marzo de 1979/ },
+  { path: "/cursos", title: "Cursos y propuestas educativas 2027 | Escuela Técnica de Juan Lacaze", text: /Oferta educativa 2027/ },
+  { path: "/estudiantes", title: "Información para estudiantes | Escuela Técnica de Juan Lacaze", text: /Preguntas frecuentes/ },
+  { path: "/novedades", title: "Noticias y novedades | Escuela Técnica de Juan Lacaze", text: /Oferta Educativa 2027/ },
+  { path: "/inscripciones", title: "Inscripciones | Escuela Técnica de Juan Lacaze", text: /Cómo inscribirse/ },
+  { path: "/contacto", title: "Contacto y ubicación | Escuela Técnica de Juan Lacaze", text: /José Salvo s\/n\.º esq\. Don Bosco/ },
+];
+
+for (const route of routes) {
+  test(`renders ${route.path} with its title, layout and content`, async () => {
+    const page = await html(route.path);
+    assert.match(page, /<html[^>]+lang="es"/i);
+    assert.match(page, new RegExp(`<title>${route.title.replaceAll("|", "\\|")}</title>`));
+    assert.match(page, route.text);
+    assert.match(page, /aria-label="Navegación principal"/);
+    assert.match(page, /href="#contenido">Saltar al contenido/);
+    assert.match(page, /id="contenido"/);
+    assert.match(page, /tecnicajuanlacaze@gmail\.com/);
+    assert.doesNotMatch(page, /Aprend[eé] haciendo/i);
+  });
+}
+
+test("keeps every primary navigation link pointing at a rendered route", async () => {
+  const home = await html("/");
+  for (const route of routes) {
+    assert.match(home, new RegExp(`href="${route.path}"`), `missing navigation link to ${route.path}`);
+  }
 });
 
-test("keeps every primary navigation anchor connected to a section", async () => {
-  const response = await request();
-  const html = await response.text();
-  const expectedSections = ["inicio", "institucion", "propuestas", "estudiantes", "novedades", "inscripciones", "contacto"];
+test("lists the 2027 bachilleratos and links to each course page", async () => {
+  const page = await html("/cursos");
+  const titles = [
+    "Educación Física y Deporte",
+    "Administración",
+    "Tecnologías de la Información",
+    "Sistemas Mecánicos",
+    "Gastronomía",
+    "Estética Personal",
+    "Educación Básica Integrada",
+  ];
+  for (const title of titles) assert.match(page, new RegExp(title), `missing course ${title}`);
+  assert.match(page, /href="\/cursos\/tecnologias-de-la-informacion"/);
+  assert.match(page, /Pendiente de confirmación/);
+});
 
-  for (const id of expectedSections) {
-    assert.match(html, new RegExp(`id="${id}"`), `missing section #${id}`);
-    assert.match(html, new RegExp(`href="#${id}"`), `missing link to #${id}`);
-  }
+test("renders a course detail page from the 2027 offer", async () => {
+  const page = await html("/cursos/gastronomia");
+  assert.match(page, /<title>Gastronomía \| Cursos \| Escuela Técnica de Juan Lacaze<\/title>/);
+  assert.match(page, /Operario calificado al finalizar segundo año/);
+  assert.match(page, /Presentación institucional Oferta Educativa 2027/);
+  assert.match(page, /href="\/cursos\/sistemas-mecanicos"/);
+  assert.match(page, /href="\/cursos\/estetica-personal"/);
+});
 
-  assert.match(html, /aria-label="Navegación principal"/);
-  assert.match(html, /href="#contenido">Saltar al contenido/);
+test("marks provisional information as pending instead of inventing it", async () => {
+  const students = await html("/estudiantes");
+  assert.match(students, /Horario pendiente de confirmación/);
+  const enrollment = await html("/inscripciones");
+  assert.match(enrollment, /Fecha pendiente de confirmación institucional/);
+  const contact = await html("/contacto");
+  assert.match(contact, /pendiente de confirmación institucional/);
+  assert.match(contact, /4586 2174/);
+});
+
+test("returns 404 for an unknown course", async () => {
+  const response = await request("/cursos/no-existe");
+  assert.equal(response.status, 404);
+  const page = await response.text();
+  assert.match(page, /No encontramos esa página/);
 });
 
 test("redirects the retired youth landing page to the institutional homepage", async () => {
