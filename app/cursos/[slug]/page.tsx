@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { ArrowLeft, ArrowRight, Clock3, GraduationCap } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, CircleCheck, Clock3, GraduationCap, Mail, Sparkles } from "lucide-react";
 import Link from "../../components/Link";
 import { notFound } from "next/navigation";
-import { CourseIconMark, CourseStatus } from "../../components/CourseCard";
+import { CourseCard, CourseIconMark, CourseStatus, courseStyle } from "../../components/CourseCard";
+import { CtaBand } from "../../components/CtaBand";
 import { PendingNote } from "../../components/Pending";
 import { courses, getCourse } from "../../content/courses";
 import { contact } from "../../content/site";
@@ -19,17 +20,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!course) return { title: "Curso no encontrado | Escuela Técnica de Juan Lacaze" };
   return {
     title: `${course.title} | Cursos | Escuela Técnica de Juan Lacaze`,
-    description: course.summary,
+    description: `${course.tagline} ${course.summary}`,
   };
 }
 
-function List({ title, items }: { title: string; items: string[] }) {
+function TileList({ title, items, icon: Icon, numbered = false }: { title: string; items: string[]; icon?: typeof Sparkles; numbered?: boolean }) {
   return (
     <section className="course-block">
       <h2>{title}</h2>
-      <ul>
-        {items.map((item) => (
-          <li key={item}>{item}</li>
+      <ul className={`tiles${numbered ? " tiles--numbered" : ""}`}>
+        {items.map((item, index) => (
+          <li key={item}>
+            {numbered ? <span className="tiles__n">{String(index + 1).padStart(2, "0")}</span> : Icon && <Icon aria-hidden="true" />}
+            <span>{item}</span>
+          </li>
         ))}
       </ul>
     </section>
@@ -41,13 +45,12 @@ export default async function CursoPage({ params }: { params: Promise<Params> })
   const course = getCourse(slug);
   if (!course) notFound();
 
-  const index = courses.findIndex((item) => item.slug === course.slug);
-  const previous = courses[index - 1];
-  const next = courses[index + 1];
+  const others = courses.filter((item) => item.slug !== course.slug);
+  const mailto = `mailto:${contact.email}?subject=${encodeURIComponent(`Consulta sobre ${course.title}`)}`;
 
   return (
-    <>
-      <section className="page-header page-header--course">
+    <div style={courseStyle(course)}>
+      <section className="course-hero">
         <div className="container">
           <nav className="breadcrumbs" aria-label="Ruta de navegación">
             <ol>
@@ -62,19 +65,35 @@ export default async function CursoPage({ params }: { params: Promise<Params> })
               </li>
             </ol>
           </nav>
-          <div className="course-hero">
-            <CourseIconMark icon={course.icon} size="lg" />
+          <div className="course-hero__grid">
             <div>
-              <p className="eyebrow">{course.level}</p>
+              <p className="pill pill--light">{course.level}</p>
               <h1>{course.title}</h1>
               {course.alias && <p className="course-hero__alias">También conocida como {course.alias}.</p>}
-              <p className="lead">{course.summary}</p>
+              <p className="course-hero__tagline">{course.tagline}</p>
+              <p className="course-hero__lead">{course.summary}</p>
               <div className="course-hero__meta">
                 <span>
-                  <Clock3 aria-hidden="true" /> Duración: {course.duration}
+                  <Clock3 aria-hidden="true" /> {course.duration}
                 </span>
                 <CourseStatus course={course} />
               </div>
+              <div className="hero__actions">
+                <Link className="button button--light button--lg" href="/inscripciones">
+                  Quiero inscribirme <ArrowRight aria-hidden="true" />
+                </Link>
+                <a className="button button--ghost button--lg" href={mailto}>
+                  <Mail aria-hidden="true" /> Hacer una consulta
+                </a>
+              </div>
+            </div>
+            <div className="course-hero__art" aria-hidden="true">
+              <CourseIconMark icon={course.icon} size="lg" />
+              <ul>
+                {course.highlights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -83,28 +102,40 @@ export default async function CursoPage({ params }: { params: Promise<Params> })
       <section className="section">
         <div className="container course-layout">
           <div className="course-main">
-            <section className="course-block">
+            <section className="course-block course-block--intro">
               <h2>Descripción del curso</h2>
               {course.description.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
             </section>
-            <List title={course.learn.title} items={course.learn.items} />
-            {course.extra && <List title={course.extra.title} items={course.extra.items} />}
-            {course.outcomes && <List title={course.outcomes.title} items={course.outcomes.items} />}
-            <List title={course.continuity.title} items={course.continuity.items} />
+            <TileList title={course.learn.title} items={course.learn.items} numbered />
+            {course.extra && <TileList title={course.extra.title} items={course.extra.items} icon={Sparkles} />}
+            {course.outcomes && <TileList title={course.outcomes.title} items={course.outcomes.items} icon={BriefcaseBusiness} />}
+            <TileList title={course.continuity.title} items={course.continuity.items} icon={GraduationCap} />
             <p className="source-line">Fuente: {course.source}.</p>
           </div>
 
           <aside className="course-aside" aria-label="Información complementaria">
             <div className="aside-card">
-              <GraduationCap aria-hidden="true" />
-              <h2>¿Te interesa este curso?</h2>
-              <p>Consultá cupos, turnos y requisitos antes de inscribirte.</p>
-              <Link className="button button--primary" href="/inscripciones">
+              <CourseIconMark icon={course.icon} />
+              <h2>¿Te ves en {course.title}?</h2>
+              <ul className="aside-card__checks">
+                <li>
+                  <CircleCheck aria-hidden="true" /> Gratis
+                </li>
+                <li>
+                  <CircleCheck aria-hidden="true" /> {course.duration}
+                </li>
+                {course.level.startsWith("Bachillerato") && (
+                  <li>
+                    <CircleCheck aria-hidden="true" /> Doble titulación
+                  </li>
+                )}
+              </ul>
+              <Link className="button button--course" href="/inscripciones">
                 Cómo inscribirse
               </Link>
-              <a className="button button--secondary" href={`mailto:${contact.email}?subject=${encodeURIComponent(`Consulta sobre ${course.title}`)}`}>
+              <a className="button button--secondary" href={mailto}>
                 Consultar por correo
               </a>
             </div>
@@ -115,32 +146,20 @@ export default async function CursoPage({ params }: { params: Promise<Params> })
         </div>
       </section>
 
-      <nav className="section section--tight course-pager" aria-label="Otros cursos">
+      <section className="section section--soft" aria-labelledby="otras-titulo">
         <div className="container">
-          {previous ? (
-            <Link href={`/cursos/${previous.slug}`}>
-              <ArrowLeft aria-hidden="true" />
-              <span>
-                <small>Anterior</small>
-                {previous.title}
-              </span>
-            </Link>
-          ) : (
-            <span />
-          )}
-          {next ? (
-            <Link href={`/cursos/${next.slug}`} className="course-pager__next">
-              <span>
-                <small>Siguiente</small>
-                {next.title}
-              </span>
-              <ArrowRight aria-hidden="true" />
-            </Link>
-          ) : (
-            <span />
-          )}
+          <h2 id="otras-titulo" className="other-title">
+            Explorá otras orientaciones
+          </h2>
+          <nav className="course-grid course-grid--compact" aria-label="Otros cursos">
+            {others.map((item) => (
+              <CourseCard course={item} key={item.slug} compact />
+            ))}
+          </nav>
         </div>
-      </nav>
-    </>
+      </section>
+
+      <CtaBand title={`¿Arrancás ${course.title} en 2027?`} />
+    </div>
   );
 }

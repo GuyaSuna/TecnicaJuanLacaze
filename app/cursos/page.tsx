@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import Link from "../components/Link";
 import { CourseCard } from "../components/CourseCard";
+import { CtaBand } from "../components/CtaBand";
 import { PageHeader } from "../components/PageHeader";
 import { PendingNote } from "../components/Pending";
 import { SectionHeading } from "../components/SectionHeading";
@@ -24,7 +25,16 @@ export default function CursosPage() {
         eyebrow="Cursos y propuestas educativas"
         title="Oferta educativa 2027"
         lead="Una vez culminada la educación media básica (9.º de EBI), UTU ofrece dos opciones de bachillerato: Bachillerato Tecnológico (BT) o Bachillerato Técnico Profesional (BTP). En Juan Lacaze podés elegir entre seis orientaciones."
-      />
+      >
+        <div className="button-row">
+          <Link className="button button--yellow" href="/#test">
+            ¿No sabés cuál? Hacé el test <ArrowRight aria-hidden="true" />
+          </Link>
+          <a className="button button--ghost" href="#ebi">
+            Educación Básica Integrada
+          </a>
+        </div>
+      </PageHeader>
 
       <section className="section">
         <div className="container">
@@ -73,23 +83,10 @@ export default function CursosPage() {
         </div>
       </section>
 
-      <section className="section section--accent">
-        <div className="container split split--center">
-          <div>
-            <p className="eyebrow">Orientación</p>
-            <h2>¿Todavía no sabés qué elegir?</h2>
-            <p>Contanos qué te interesa y te ayudamos a encontrar la propuesta que mejor se ajuste a tu edad y trayectoria.</p>
-          </div>
-          <div className="button-row">
-            <a className="button button--primary" href={`mailto:${contact.email}?subject=Consulta%20sobre%20cursos%202027`}>
-              Escribir a la escuela
-            </a>
-            <Link className="button button--secondary" href="/contacto">
-              Ver otras vías de contacto
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CtaBand
+        title="¿Todavía no sabés qué elegir?"
+        text={`Contanos qué te interesa y te ayudamos a encontrar la propuesta que mejor se ajuste a tu edad y trayectoria. Escribinos a ${contact.email}.`}
+      />
     </>
   );
 }

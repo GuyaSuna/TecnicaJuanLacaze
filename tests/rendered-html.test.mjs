@@ -20,7 +20,7 @@ function html(pathname) {
 const href = (path) => `href="${basePath}${path === "/" ? "/" : `${path}/`}"`;
 
 const routes = [
-  { path: "/", title: "Escuela Técnica de Juan Lacaze | UTU", text: /Un lugar para aprender, crecer y construir tu camino/ },
+  { path: "/", title: "Escuela Técnica de Juan Lacaze | UTU", text: /Lo que te gusta <span class="highlight">puede ser tu profesión/ },
   { path: "/institucion", title: "Sobre la institución | Escuela Técnica de Juan Lacaze", text: /4 de marzo de 1979/ },
   { path: "/cursos", title: "Cursos y propuestas educativas 2027 | Escuela Técnica de Juan Lacaze", text: /Oferta educativa 2027/ },
   { path: "/estudiantes", title: "Información para estudiantes | Escuela Técnica de Juan Lacaze", text: /Preguntas frecuentes/ },
@@ -52,7 +52,7 @@ test("keeps every primary navigation link pointing at an exported route", () => 
 test("prefixes images and icons with the publishing base path", () => {
   const home = html("/");
   assert.ok(home.includes(`src="${basePath}/images/escudo.png"`), "logo should use the base path");
-  assert.ok(home.includes(`src="${basePath}/images/escuela.jpg"`), "hero image should use the base path");
+  assert.ok(html("/institucion").includes(`src="${basePath}/images/escuela.jpg"`), "school photo should use the base path");
   assert.ok(home.includes(`<link rel="icon" href="${basePath}/icon.png`), "favicon should use the base path");
   const ogImage = home.match(/<meta property="og:image" content="([^"]+)"/)?.[1] ?? "";
   assert.match(ogImage, new RegExp(`^https?://[^/]+${basePath}/opengraph-image\\.png`), "social image should be an absolute URL with a single base path");

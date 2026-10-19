@@ -39,6 +39,12 @@ export type Course = {
   statusLabel: string;
   source: string;
   icon: CourseIcon;
+  /** Color de la orientación (debe contrastar con texto blanco). */
+  color: string;
+  /** Frase corta y directa para tarjetas y portada. */
+  tagline: string;
+  /** Tres temas destacados, tomados del contenido del curso. */
+  highlights: [string, string, string];
 };
 
 /** Información común a todos los bachilleratos (Oferta Educativa 2027). */
@@ -88,6 +94,9 @@ export const courses: Course[] = [
     statusLabel: "Apertura 2027 pendiente de confirmación",
     source: "Cartelera institucional 2026. La presentación Oferta Educativa 2027 describe únicamente los bachilleratos.",
     icon: "book",
+    color: "#2563eb",
+    tagline: "Tu primer paso en UTU, después de la escuela.",
+    highlights: ["7.º, 8.º y 9.º", "Tecnología y talleres", "Después: UTU o liceo"],
   },
   {
     slug: "educacion-fisica-y-deporte",
@@ -130,6 +139,9 @@ export const courses: Course[] = [
     statusLabel: "En la Oferta Educativa 2027",
     source: "Presentación institucional Oferta Educativa 2027",
     icon: "activity",
+    color: "#15803d",
+    tagline: "Convertí tu pasión por el deporte en profesión.",
+    highlights: ["Fisiología y biomecánica", "Primeros auxilios", "Arbitraje amateur"],
   },
   {
     slug: "administracion",
@@ -174,6 +186,9 @@ export const courses: Course[] = [
     statusLabel: "En la Oferta Educativa 2027",
     source: "Presentación institucional Oferta Educativa 2027",
     icon: "briefcase",
+    color: "#7c3aed",
+    tagline: "Entendé cómo funciona una empresa por dentro.",
+    highlights: ["Contabilidad", "Economía y comercialización", "Informática aplicada"],
   },
   {
     slug: "tecnologias-de-la-informacion",
@@ -214,6 +229,9 @@ export const courses: Course[] = [
     statusLabel: "En la Oferta Educativa 2027",
     source: "Presentación institucional Oferta Educativa 2027",
     icon: "laptop",
+    color: "#0e7490",
+    tagline: "Programá, creá webs y armá redes de verdad.",
+    highlights: ["Programación", "Diseño web", "Redes y bases de datos"],
   },
   {
     slug: "sistemas-mecanicos",
@@ -249,6 +267,9 @@ export const courses: Course[] = [
     statusLabel: "En la Oferta Educativa 2027",
     source: "Presentación institucional Oferta Educativa 2027",
     icon: "wrench",
+    color: "#c2410c",
+    tagline: "Diseñá, fabricá y repará con tus propias manos.",
+    highlights: ["Máquinas herramienta", "Soldadura", "Dibujo técnico"],
   },
   {
     slug: "gastronomia",
@@ -288,6 +309,9 @@ export const courses: Course[] = [
     statusLabel: "En la Oferta Educativa 2027",
     source: "Presentación institucional Oferta Educativa 2027",
     icon: "chef",
+    color: "#dc2626",
+    tagline: "Cociná, creá y aprendé a dar un servicio de primera.",
+    highlights: ["Cocina y sala", "Bar y cafetería", "Operario calificado en 2.º"],
   },
   {
     slug: "estetica-personal",
@@ -320,6 +344,9 @@ export const courses: Course[] = [
     statusLabel: "En la Oferta Educativa 2027",
     source: "Presentación institucional Oferta Educativa 2027",
     icon: "scissors",
+    color: "#db2777",
+    tagline: "Estilo, color y tendencia: tu creatividad hecha oficio.",
+    highlights: ["Coloración creativa", "Arte en uñas", "Estilismo artístico"],
   },
 ];
 

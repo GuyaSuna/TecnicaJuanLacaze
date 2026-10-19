@@ -50,6 +50,15 @@ export function SiteFooter() {
               <a href={`mailto:${contact.email}`}>{contact.email}</a>
             </p>
           </address>
+          <ul className="social-links" aria-label="Redes sociales">
+            {contact.social.map((item) => (
+              <li key={item.network}>
+                <a href={item.url} target="_blank" rel="noreferrer">
+                  {item.network}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="site-footer__official">

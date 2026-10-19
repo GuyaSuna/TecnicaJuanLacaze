@@ -66,8 +66,8 @@ export function SiteHeader() {
               );
             })}
           </ul>
-          <Link className="button button--primary main-nav__cta" href="/inscripciones" onClick={close}>
-            Cómo inscribirse
+          <Link className="button button--yellow main-nav__cta" href="/inscripciones" onClick={close}>
+            Quiero inscribirme
           </Link>
         </nav>
 
