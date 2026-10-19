@@ -1,28 +1,26 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { headers } from "next/headers";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
+import { siteName, siteUrl } from "./content/site";
 import "./globals.css";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const incoming = await headers();
-  const host = incoming.get("x-forwarded-host") ?? incoming.get("host") ?? "localhost:3000";
-  const protocol = incoming.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
-  const origin = `${protocol}://${host}`;
-  const title = "Escuela Técnica de Juan Lacaze | UTU";
-  const description =
-    "Sitio institucional de la Escuela Técnica de Juan Lacaze (DGETP - UTU): cursos y bachilleratos, información para estudiantes, novedades, inscripciones y contacto.";
-  return {
-    title,
-    description,
-    icons: { icon: [{ url: "/favicon.ico", sizes: "48x48" }, { url: "/favicon.png", type: "image/png", sizes: "64x64" }], apple: "/apple-touch-icon.png" },
-    openGraph: { title, description, images: [`${origin}/og.png`], locale: "es_UY", type: "website", siteName: "Escuela Técnica de Juan Lacaze" },
-    twitter: { card: "summary_large_image", title, description, images: [`${origin}/og.png`] },
-  };
-}
+const title = "Escuela Técnica de Juan Lacaze | UTU";
+const description =
+  "Sitio institucional de la Escuela Técnica de Juan Lacaze (DGETP - UTU): cursos y bachilleratos, información para estudiantes, novedades, inscripciones y contacto.";
+
+// Los íconos y la imagen social se toman de app/favicon.ico, app/icon.png,
+// app/apple-icon.png y app/opengraph-image.png (convención de archivos de Next.js).
+export const metadata: Metadata = {
+  // Solo el origen: Next.js ya agrega el basePath a las rutas de los metadatos.
+  metadataBase: new URL(new URL(siteUrl).origin),
+  title,
+  description,
+  openGraph: { title, description, locale: "es_UY", type: "website", siteName },
+  twitter: { card: "summary_large_image", title, description },
+};
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

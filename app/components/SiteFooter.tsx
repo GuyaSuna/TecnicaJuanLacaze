@@ -1,7 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "./Link";
-import { contact, lastReview, navigation, officialLinks, organization, phoneHref, siteName } from "../content/site";
+import { asset, contact, lastReview, navigation, officialLinks, organization, phoneHref, siteName } from "../content/site";
 
 function formatReview(iso: string) {
   const [year, month, day] = iso.split("-");
@@ -13,7 +13,7 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="site-footer__inner">
         <div className="site-footer__brand">
-          <Image src="/images/escudo.png" alt="" width={56} height={56} />
+          <Image src={asset("/images/escudo.png")} alt="" width={56} height={56} />
           <div>
             <strong>{siteName}</strong>
             <p>{organization}</p>

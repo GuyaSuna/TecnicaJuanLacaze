@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "./Link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { navigation, siteShortName } from "../content/site";
+import { asset, navigation, siteShortName } from "../content/site";
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -40,7 +40,7 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="site-header__inner">
         <Link className="brand" href="/" aria-label={`${siteShortName}, ir al inicio`}>
-          <Image src="/images/escudo.png" alt="" width={44} height={44} priority />
+          <Image src={asset("/images/escudo.png")} alt="" width={44} height={44} priority />
           <span className="brand__text">
             <strong>Escuela Técnica</strong>
             <span>Juan Lacaze · UTU</span>

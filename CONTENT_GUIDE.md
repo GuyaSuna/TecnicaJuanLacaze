@@ -1,6 +1,6 @@
 # Guía de contenido y mantenimiento
 
-Sitio institucional de la Escuela Técnica de Juan Lacaze (DGETP - UTU). Está construido con vinext (compatible con el App Router de Next.js), React 19 y una hoja de estilos propia en `app/globals.css`.
+Sitio institucional de la Escuela Técnica de Juan Lacaze (DGETP - UTU). Está construido con Next.js (App Router, exportación estática), React 19 y una hoja de estilos propia en `app/globals.css`. Se publica en GitHub Pages (ver README.md).
 
 ## Arquitectura
 
@@ -14,9 +14,17 @@ Sitio institucional de la Escuela Técnica de Juan Lacaze (DGETP - UTU). Está c
 | `/novedades` | `app/novedades/page.tsx` | Noticias con enlace a la fuente oficial. |
 | `/inscripciones` | `app/inscripciones/page.tsx` | Pasos, documentación orientativa y período (pendiente). |
 | `/contacto` | `app/contacto/page.tsx` | Dirección, teléfonos, correo, redes, mapa. |
-| `/futuro` | `app/futuro/page.tsx` | Redirección histórica a la portada. |
 
-Componentes compartidos en `app/components/`: encabezado con menú móvil (`SiteHeader`), pie (`SiteFooter`), encabezado de página (`PageHeader`), títulos de sección (`SectionHeading`), tarjetas de curso (`CourseCard`), tarjetas de enlace (`LinkCard`), noticias (`NewsCard`), acordeón de preguntas (`Faq`), marcas de contenido provisional (`Pending`) y `Link`, un envoltorio de `<a>` que reemplaza a `next/link` mientras vinext 1.0.0-beta.2 falle en la navegación del lado del cliente.
+Componentes compartidos en `app/components/`: encabezado con menú móvil (`SiteHeader`), pie (`SiteFooter`), encabezado de página (`PageHeader`), títulos de sección (`SectionHeading`), tarjetas de curso (`CourseCard`), tarjetas de enlace (`LinkCard`), noticias (`NewsCard`), acordeón de preguntas (`Faq`), marcas de contenido provisional (`Pending`) y `Link` (reexporta `next/link`).
+
+## Rutas, imágenes y GitHub Pages
+
+El sitio se publica bajo un prefijo (`/TecnicaJuanLacaze`). Para que todo funcione con y sin prefijo:
+
+- Enlaces internos: usar siempre el componente `Link` con rutas desde la raíz (`href="/cursos"`). Agrega el prefijo solo.
+- Imágenes de `public/`: envolver la ruta con `asset()` de `app/content/site.ts` (`src={asset("/images/escudo.png")}`). En `news.ts` alcanza con escribir `/images/...`; `NewsCard` ya aplica `asset()`.
+- Íconos y vista previa social: `app/favicon.ico`, `app/icon.png`, `app/apple-icon.png` y `app/opengraph-image.png`. Para cambiarlos, reemplazar esos archivos manteniendo el nombre.
+- No se pueden usar funciones de servidor (`headers()`, `cookies()`, rutas `api/`, redirecciones del servidor): el sitio es 100 % estático.
 
 ## Dónde actualizar la información
 
@@ -24,7 +32,7 @@ Componentes compartidos en `app/components/`: encabezado con menú móvil (`Site
 - `app/content/courses.ts`: cursos. Cada curso tiene descripción, qué se aprende, salidas, continuidad, `status` y `source`.
 - `app/content/news.ts`: novedades. Agregá nuevas entradas al comienzo del arreglo, con fecha `AAAA-MM-DD`.
 - `app/content/faq.ts`: preguntas frecuentes.
-- `public/images/`: fotografías y escudo (`escudo.png`). En `public/` están los íconos del sitio (`favicon.ico`, `favicon.png`, `apple-touch-icon.png`) y la tarjeta de vista previa social (`og.png`).
+- `public/images/`: fotografías y escudo (`escudo.png`).
 
 ## Convención para contenido provisional
 
@@ -59,4 +67,4 @@ npm run lint
 npm test
 ```
 
-`npm test` compila el sitio y comprueba que cada ruta responda, que la navegación esté completa, que los cursos 2027 aparezcan y que el contenido provisional esté marcado.
+`npm test` compila el sitio en `out/` y comprueba que cada página se exporte, que la navegación esté completa, que las imágenes usen el prefijo de publicación, que los cursos 2027 aparezcan y que el contenido provisional esté marcado. Para probar con el prefijo de GitHub Pages en PowerShell: `$env:NEXT_PUBLIC_BASE_PATH="/TecnicaJuanLacaze"; npm test`.

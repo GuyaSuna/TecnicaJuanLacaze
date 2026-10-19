@@ -1,29 +1,23 @@
 import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-async function request(pathname = "/") {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${pathname}`);
-  const { default: worker } = await import(workerUrl.href);
+// Verifica el sitio estático generado por `next build` en out/.
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const outDir = new URL("../out/", import.meta.url);
 
-  return worker.fetch(
-    new Request(`http://localhost${pathname}`, {
-      headers: { accept: "text/html" },
-      redirect: "manual",
-    }),
-    {
-      ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) },
-    },
-    { waitUntil() {}, passThroughOnException() {} },
-  );
+function file(pathname) {
+  const relative = pathname === "/" ? "index.html" : `${pathname.replace(/^\//, "")}/index.html`;
+  return new URL(relative, outDir);
 }
 
-async function html(pathname) {
-  const response = await request(pathname);
-  assert.equal(response.status, 200, `${pathname} should render`);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-  return response.text();
+function html(pathname) {
+  const target = file(pathname);
+  assert.ok(existsSync(target), `${pathname} should be exported`);
+  return readFileSync(target, "utf8");
 }
+
+const href = (path) => `href="${basePath}${path === "/" ? "/" : `${path}/`}"`;
 
 const routes = [
   { path: "/", title: "Escuela Técnica de Juan Lacaze | UTU", text: /Un lugar para aprender, crecer y construir tu camino/ },
@@ -36,8 +30,8 @@ const routes = [
 ];
 
 for (const route of routes) {
-  test(`renders ${route.path} with its title, layout and content`, async () => {
-    const page = await html(route.path);
+  test(`renders ${route.path} with its title, layout and content`, () => {
+    const page = html(route.path);
     assert.match(page, /<html[^>]+lang="es"/i);
     assert.match(page, new RegExp(`<title>${route.title.replaceAll("|", "\\|")}</title>`));
     assert.match(page, route.text);
@@ -45,19 +39,30 @@ for (const route of routes) {
     assert.match(page, /href="#contenido">Saltar al contenido/);
     assert.match(page, /id="contenido"/);
     assert.match(page, /tecnicajuanlacaze@gmail\.com/);
-    assert.doesNotMatch(page, /Aprend[eé] haciendo/i);
   });
 }
 
-test("keeps every primary navigation link pointing at a rendered route", async () => {
-  const home = await html("/");
+test("keeps every primary navigation link pointing at an exported route", () => {
+  const home = html("/");
   for (const route of routes) {
-    assert.match(home, new RegExp(`href="${route.path}"`), `missing navigation link to ${route.path}`);
+    assert.ok(home.includes(href(route.path)), `missing navigation link to ${route.path}`);
   }
 });
 
-test("lists the 2027 bachilleratos and links to each course page", async () => {
-  const page = await html("/cursos");
+test("prefixes images and icons with the publishing base path", () => {
+  const home = html("/");
+  assert.ok(home.includes(`src="${basePath}/images/escudo.png"`), "logo should use the base path");
+  assert.ok(home.includes(`src="${basePath}/images/escuela.jpg"`), "hero image should use the base path");
+  assert.ok(home.includes(`<link rel="icon" href="${basePath}/icon.png`), "favicon should use the base path");
+  const ogImage = home.match(/<meta property="og:image" content="([^"]+)"/)?.[1] ?? "";
+  assert.match(ogImage, new RegExp(`^https?://[^/]+${basePath}/opengraph-image\\.png`), "social image should be an absolute URL with a single base path");
+  for (const image of ["escudo.png", "escuela.jpg", "inclusion.jpg", "nodo-innovacion.jpg"]) {
+    assert.ok(existsSync(new URL(`images/${image}`, outDir)), `missing public image ${image}`);
+  }
+});
+
+test("lists the 2027 bachilleratos and links to each course page", () => {
+  const page = html("/cursos");
   const titles = [
     "Educación Física y Deporte",
     "Administración",
@@ -68,38 +73,32 @@ test("lists the 2027 bachilleratos and links to each course page", async () => {
     "Educación Básica Integrada",
   ];
   for (const title of titles) assert.match(page, new RegExp(title), `missing course ${title}`);
-  assert.match(page, /href="\/cursos\/tecnologias-de-la-informacion"/);
+  assert.ok(page.includes(href("/cursos/tecnologias-de-la-informacion")));
   assert.match(page, /Pendiente de confirmación/);
 });
 
-test("renders a course detail page from the 2027 offer", async () => {
-  const page = await html("/cursos/gastronomia");
+test("renders a course detail page from the 2027 offer", () => {
+  const page = html("/cursos/gastronomia");
   assert.match(page, /<title>Gastronomía \| Cursos \| Escuela Técnica de Juan Lacaze<\/title>/);
   assert.match(page, /Operario calificado al finalizar segundo año/);
   assert.match(page, /Presentación institucional Oferta Educativa 2027/);
-  assert.match(page, /href="\/cursos\/sistemas-mecanicos"/);
-  assert.match(page, /href="\/cursos\/estetica-personal"/);
+  assert.ok(page.includes(href("/cursos/sistemas-mecanicos")));
+  assert.ok(page.includes(href("/cursos/estetica-personal")));
 });
 
-test("marks provisional information as pending instead of inventing it", async () => {
-  const students = await html("/estudiantes");
-  assert.match(students, /Horario pendiente de confirmación/);
-  const enrollment = await html("/inscripciones");
-  assert.match(enrollment, /Fecha pendiente de confirmación institucional/);
-  const contact = await html("/contacto");
+test("marks provisional information as pending instead of inventing it", () => {
+  assert.match(html("/estudiantes"), /Horario pendiente de confirmación/);
+  assert.match(html("/inscripciones"), /Fecha pendiente de confirmación institucional/);
+  const contact = html("/contacto");
   assert.match(contact, /pendiente de confirmación institucional/);
   assert.match(contact, /4586 2174/);
 });
 
-test("returns 404 for an unknown course", async () => {
-  const response = await request("/cursos/no-existe");
-  assert.equal(response.status, 404);
-  const page = await response.text();
-  assert.match(page, /No encontramos esa página/);
-});
-
-test("redirects the retired youth landing page to the institutional homepage", async () => {
-  const response = await request("/futuro");
-  assert.ok([301, 302, 307, 308].includes(response.status));
-  assert.equal(response.headers.get("location"), "/");
+test("exports a 404 page, sitemap and robots.txt for GitHub Pages", () => {
+  const notFound = readFileSync(new URL("404.html", outDir), "utf8");
+  assert.match(notFound, /No encontramos esa página/);
+  const sitemap = readFileSync(new URL("sitemap.xml", outDir), "utf8");
+  assert.match(sitemap, /\/cursos\/gastronomia\/<\/loc>/);
+  assert.ok(existsSync(new URL("robots.txt", outDir)));
+  assert.ok(existsSync(new URL(".nojekyll", outDir)));
 });

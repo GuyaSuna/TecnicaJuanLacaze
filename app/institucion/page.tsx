@@ -4,7 +4,7 @@ import Image from "next/image";
 import { PageHeader } from "../components/PageHeader";
 import { PendingBadge, PendingNote } from "../components/Pending";
 import { SectionHeading } from "../components/SectionHeading";
-import { communityPartners, institutionalFigures, managementTeam, officialLinks } from "../content/site";
+import { asset, communityPartners, institutionalFigures, managementTeam, officialLinks } from "../content/site";
 
 export const metadata: Metadata = {
   title: "Sobre la institución | Escuela Técnica de Juan Lacaze",
@@ -39,7 +39,7 @@ export default function InstitucionPage() {
             </a>
           </div>
           <figure className="photo-card">
-            <Image src="/images/escuela.jpg" alt="Fachada de la Escuela Técnica de Juan Lacaze" width={350} height={205} sizes="(max-width: 900px) 100vw, 40vw" />
+            <Image src={asset("/images/escuela.jpg")} alt="Fachada de la Escuela Técnica de Juan Lacaze" width={350} height={205} sizes="(max-width: 900px) 100vw, 40vw" />
             <figcaption>Edificio de la escuela, en José Salvo esquina Don Bosco.</figcaption>
           </figure>
         </div>

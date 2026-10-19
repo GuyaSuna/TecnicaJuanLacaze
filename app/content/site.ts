@@ -10,6 +10,17 @@ export const siteName = "Escuela Técnica de Juan Lacaze";
 export const siteShortName = "Escuela Técnica Juan Lacaze";
 export const organization = "Dirección General de Educación Técnico Profesional (DGETP - UTU) · ANEP";
 
+/** Prefijo de publicación en GitHub Pages (ver `next.config.ts`). */
+export const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+/** URL pública del sitio, usada en metadatos, sitemap y vistas previas sociales. */
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://guyasuna.github.io/TecnicaJuanLacaze";
+
+/** Ruta a un archivo de `public/` con el prefijo de publicación. Ej.: asset("/images/escudo.png"). */
+export function asset(path: string) {
+  return `${basePath}${path}`;
+}
+
 /** Fecha de la última revisión editorial del contenido (AAAA-MM-DD). */
 export const lastReview = "2026-09-13";
 

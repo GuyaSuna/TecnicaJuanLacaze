@@ -8,7 +8,7 @@ import { PendingBadge } from "./components/Pending";
 import { SectionHeading } from "./components/SectionHeading";
 import { bachilleratoFacts, courses } from "./content/courses";
 import { news } from "./content/news";
-import { contact, officialLinks, phoneHref } from "./content/site";
+import { asset, contact, officialLinks, phoneHref } from "./content/site";
 
 export default function HomePage() {
   const latest = news.slice(0, 3);
@@ -40,7 +40,7 @@ export default function HomePage() {
           </div>
           <figure className="hero__figure">
             <Image
-              src="/images/escuela.jpg"
+              src={asset("/images/escuela.jpg")}
               alt="Fachada de la Escuela Técnica de Juan Lacaze, en José Salvo esquina Don Bosco"
               width={350}
               height={205}

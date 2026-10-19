@@ -1,18 +1,6 @@
-import type { AnchorHTMLAttributes, Ref } from "react";
-
 /**
- * Enlace interno.
- *
- * Renderiza un `<a>` común en lugar de `next/link`: con vinext 1.0.0-beta.2 la
- * navegación del lado del cliente de `next/link` falla en producción
- * ("navigateClientSide is not a function"). El sitio es pequeño y se renderiza
- * en el servidor, por lo que la navegación completa es rápida y confiable.
- * Cuando el framework se actualice, alcanza con volver a exportar `next/link` desde acá.
+ * Enlace interno. `next/link` agrega automáticamente el `basePath`
+ * configurado para GitHub Pages, así que los `href` se escriben siempre
+ * desde la raíz del sitio (por ejemplo, "/cursos").
  */
-export default function Link({ ref, children, ...props }: AnchorHTMLAttributes<HTMLAnchorElement> & { ref?: Ref<HTMLAnchorElement> }) {
-  return (
-    <a ref={ref} {...props}>
-      {children}
-    </a>
-  );
-}
+export { default } from "next/link";

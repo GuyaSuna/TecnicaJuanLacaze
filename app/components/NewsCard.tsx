@@ -2,6 +2,7 @@ import { ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "./Link";
 import { formatDate, type NewsItem } from "../content/news";
+import { asset } from "../content/site";
 
 export function NewsCard({ item, featured = false }: { item: NewsItem; featured?: boolean }) {
   const label = item.external ? "Leer en utu.edu.uy" : "Leer más";
@@ -9,7 +10,7 @@ export function NewsCard({ item, featured = false }: { item: NewsItem; featured?
     <>
       {item.image && (
         <Image
-          src={item.image.src}
+          src={asset(item.image.src)}
           alt={item.image.alt}
           width={item.image.width}
           height={item.image.height}
